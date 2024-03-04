@@ -40,7 +40,7 @@ def parse_config(cve_dir,cveid):
     cve_config=os.path.join(cve_dir,"config")
     if not os.path.exists(cve_config):
         return None
-    with open(cve_config,mode="w") as f:
+    with open(cve_config,mode="r") as f:
         contents=f.read().split("\n")
     dic={"binary":None,"cmd":None,"exploit":None,"build-cmd":None,"fix-file-path":None,"fix-loc":None,"crash-file-path":None,"crash-loc":None}
     for content in contents:
@@ -70,23 +70,30 @@ def main():
 
     stamp=str(int(time.time()))
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    tool_config_dir=os.path.join(root_dir,tool)
+    Framework_dir=os.path.dirname(os.path.abspath(__file__))
+    tool_config_dir=os.path.join(Framework_dir,tool)
     software_dir=os.path.join(tool_config_dir,software)
     cve_dir=os.path.join(software_dir,cveid)
+    
+    result_root_dir=os.path.join(root_dir,"vul4c-result")
+    if not os.path.exists(result_root_dir):
+        os.mkdir(result_root_dir)
+
+    vul4c_runtime_dir=os.path.join(root_dir,"vul4c_runtime")
+    if not os.path.exists(vul4c_runtime_dir):
+        os.mkdir(vul4c_runtime_dir)
+    
+    result_dir=tool.lower()+"_"+cveid.lower()+"_"+stamp
+    result_dir=os.path.join(result_root_dir,result_dir)
+    os.mkdir(result_dir)
+
+    init_logger(result_dir)
+
     if not os.path.exists(cve_dir):
         logger.info("cve config dir dont exist, please check your software and cveid")
         sys.exit(1)
     instrument_dir=os.path.join(tool_config_dir,"INSTRUMENT")
     d=parse_config(cve_dir, cveid)
-
-    result_root_dir=os.path.join(root_dir,"vul4c-result")
-    vul4c_runtime_dir=os.path.join(root_dir,"vul4c_runtime")
-    
-    if not os.path.exists(result_root_dir):
-        os.mkdir(result_root_dir)
-    
-    if not os.path.exists(vul4c_runtime_dir):
-        os.mkdir(vul4c_runtime_dir)
 
     cve_runtime_dir=os.path.join(os.path.join(os.path.join(vul4c_runtime_dir,tool),software),cveid)
     if os.path.exists(cve_runtime_dir):
@@ -98,13 +105,7 @@ def main():
         copy_command=f"cp -r {cve_dir}/* {cve_runtime_dir}"
     execute_command(copy_command)
 
-    result_dir=tool.lower()+"_"+cveid.lower()+"_"+stamp
-    result_dir=os.path.join(result_root_dir,result_dir)
-    os.mkdir(result_dir)
-
     container_dir=f"/{cveid}"
-
-    init_logger(result_dir)
 
     if tool in ["VulnFix"]:
         container_name="vul4c_"+tool.lower()+"_"+cveid.lower()+"_"+stamp
