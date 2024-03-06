@@ -100,7 +100,7 @@ def main():
         shutil.rmtree(cve_runtime_dir)
     os.makedirs(cve_runtime_dir,exist_ok=True)
 
-    test_script_dir=os.path.join(os.path.join(root_dir,"test"),tool)
+    test_script_dir=os.path.join(os.path.join(root_dir,"test"),software)
     instrument_dir=os.path.join(tool_config_dir,"INSTRUMENT")
     copy_command=f"cp -r {cve_dir}/* {cve_runtime_dir}"
     execute_command(copy_command)
