@@ -84,7 +84,7 @@ class Test(DockerContainer):
             
             new_files="|".join(new_files)
             
-            test_command=f"bash -c \"python3 {self.test} {self.data.source} {new_files} {self.data.fix_file}\""
+            test_command=f"bash -c \"bash {self.test} {self.data.source} {new_files} {self.data.fix_file}\""
             exit_code,output=self.exec_command(test_command,workdir=self.work_dir)
         
             if exit_code != 0:
@@ -93,6 +93,12 @@ class Test(DockerContainer):
                 test_result[dir]=True
         return test_result
 
+    def save_result(self):
+        mkdir_command=f"bash -c \"mkdir {self.result_dir}\""
+        exit_code,output=self.exec_command(mkdir_command)
+
+        result_file=os.path.join(self.work_dir,"runtime/test_result")
+        self.cp_file(result_file,self.result_dir)
 
     def run(self):
         self.config()
@@ -106,5 +112,6 @@ class Test(DockerContainer):
         test_result_file=os.path.join(self.work_dir,"runtime/test_result")
         with open(test_result_file, mode='w') as f:
             f.write(contents)
+        self.save_result()
     
                 

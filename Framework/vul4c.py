@@ -92,18 +92,25 @@ def main():
     if not os.path.exists(cve_dir):
         logger.info("cve config dir dont exist, please check your software and cveid")
         sys.exit(1)
-    instrument_dir=os.path.join(tool_config_dir,"INSTRUMENT")
+    
     d=parse_config(cve_dir, cveid)
 
     cve_runtime_dir=os.path.join(os.path.join(os.path.join(vul4c_runtime_dir,tool),software),cveid)
     if os.path.exists(cve_runtime_dir):
         shutil.rmtree(cve_runtime_dir)
     os.makedirs(cve_runtime_dir,exist_ok=True)
-    if os.path.isdir(instrument_dir):
-        copy_command=f"cp -r {instrument_dir}/* {cve_dir}/* {cve_runtime_dir}"
-    else:
-        copy_command=f"cp -r {cve_dir}/* {cve_runtime_dir}"
+
+    test_script_dir=os.path.join(os.path.join(root_dir,"test"),tool)
+    instrument_dir=os.path.join(tool_config_dir,"INSTRUMENT")
+    copy_command=f"cp -r {cve_dir}/* {cve_runtime_dir}"
     execute_command(copy_command)
+    if os.path.isdir(test_script_dir):
+        copy_command=f"cp -r {test_script_dir}/* {cve_runtime_dir}"
+        execute_command(copy_command)
+    if os.path.isdir(instrument_dir):
+        copy_command=f"cp -r {instrument_dir}/* {cve_runtime_dir}"
+        execute_command(copy_command)
+    
 
     container_dir=f"/{cveid}"
 
@@ -197,10 +204,11 @@ def main():
     else:
         logger.error("tool dont exist, please check your tool name")
     
-    # if not d==None:
-    #     test_name="vul4c_"+tool.lower()+"_"+"test"+"_"+cveid.lower()+"_"+stamp
-    #     test_container = Test(cve_runtime_dir, container_dir, container_dir, test_name, d)
-    #     test_id=test_container.container.id
-    #     test_container.run()
+    test_file=os.path.join(cve_runtime_dir,"test.sh")
+    if (not d==None) and os.path.exists(test_file):
+        test_name="vul4c_"+tool.lower()+"_"+"test"+"_"+cveid.lower()+"_"+stamp
+        test_container = Test(cve_runtime_dir, container_dir, container_dir, test_name, d)
+        test_id=test_container.container.id
+        test_container.run()
 if __name__ == "__main__":
     main()
