@@ -49,7 +49,7 @@ class Test(DockerContainer):
 
     #fix-file-path save the relative path of fix file and split with "|"
     def parse_config_file(self, config_file):
-        with open(config_file) as f:
+        with open(config_file, mode="r") as f:
             contents=f.read().split("\n")
         dic={}
         for content in contents:
@@ -61,8 +61,8 @@ class Test(DockerContainer):
 
     def test(self):
         test_result=dict()
-        for dir in os.listdir(self.data.runtime):
-            candidate_dir=os.path.join(self.data.runtime,dir)
+        for dir in os.listdir(self.data.runtime_host):
+            candidate_dir=os.path.join(self.data.runtime_host,dir)
             if not os.path.isdir(candidate_dir):
                 # candidate_list.append(candidate_dir)
                 continue
@@ -82,6 +82,9 @@ class Test(DockerContainer):
             else:
                 new_files=[os.path.join(candidate_dir,item) for item in files]
             
+            #replace the abs path in host with th abs path in container
+            new_files=[self.data.host_path_2_container_path(item) for item in new_files] 
+
             new_files="|".join(new_files)
             
             test_command=f"bash -c \"bash {self.test} {self.data.source} {new_files} {self.data.fix_file}\""

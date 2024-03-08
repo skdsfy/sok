@@ -10,7 +10,6 @@ if [ $? -ne 0 ]; then
 fi
 output1=$(make check -j10)
 
-# 提取 TOTAL, PASS, SKIP, XFAIL, FAIL, XPASS, ERROR 的数量
 total1=$(echo "$output1" | grep -oP '# TOTAL: \K\d+')
 pass1=$(echo "$output1" | grep -oP '# PASS:  \K\d+')
 skip1=$(echo "$output1" | grep -oP '# SKIP:  \K\d+')
@@ -49,7 +48,6 @@ if [ $? -ne 0 ]; then
 fi
 output2=$(make check -j10)
 
-# 提取 TOTAL, PASS, SKIP, XFAIL, FAIL, XPASS, ERROR 的数量
 total2=$(echo "$output2" | grep -oP '# TOTAL: \K\d+')
 pass2=$(echo "$output2" | grep -oP '# PASS:  \K\d+')
 skip2=$(echo "$output2" | grep -oP '# SKIP:  \K\d+')
