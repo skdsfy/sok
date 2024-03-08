@@ -87,7 +87,7 @@ class Test(DockerContainer):
 
             new_files="|".join(new_files)
             
-            test_command=f"bash -c \"bash {self.test} {self.data.source} {new_files} {self.data.fix_file}\""
+            test_command=f"bash -c \"bash {self.test_file} {self.data.source} {new_files} {self.data.fix_file}\""
             exit_code,output=self.exec_command(test_command,workdir=self.work_dir)
         
             if exit_code != 0:
