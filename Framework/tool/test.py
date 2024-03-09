@@ -96,25 +96,27 @@ class Test(DockerContainer):
                 test_result[dir]=True
         return test_result
 
-    def save_result(self):
-        mkdir_command=f"bash -c \"mkdir {self.result_dir}\""
-        exit_code,output=self.exec_command(mkdir_command)
+    def save_result(self,test_result_dic):
 
-        result_file=os.path.join(self.work_dir,"runtime/test_result")
-        self.cp_file(result_file,self.result_dir)
-
-    def run(self):
-        self.config()
-        test_result=self.test()
         contents=""
-        for key,value in test_result.items():
+        for key,value in test_result_dic.items():
             if value:
                 contents+=f"{key}:Pass\n"
             else:
                 contents+=f"{key}:Fail\n"
-        test_result_file=os.path.join(self.data.runtime_host,"test_result")
+        test_result_file=os.path.join(self.data.abs_path_host,"test_result")
+
         with open(test_result_file, mode='w') as f:
             f.write(contents)
-        self.save_result()
+
+        mkdir_command=f"bash -c \"mkdir {self.result_dir}\""
+        exit_code,output=self.exec_command(mkdir_command)
+
+        self.cp_file(test_result_file,self.result_dir)
+
+    def run(self):
+        self.config()
+        test_result=self.test()
+        self.save_result(test_result)
     
                 
