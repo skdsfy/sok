@@ -112,7 +112,7 @@ class Test(DockerContainer):
                 contents+=f"{key}:Pass\n"
             else:
                 contents+=f"{key}:Fail\n"
-        test_result_file=os.path.join(self.work_dir,"runtime/test_result")
+        test_result_file=os.path.join(self.data.runtime_host,"test_result")
         with open(test_result_file, mode='w') as f:
             f.write(contents)
         self.save_result()
